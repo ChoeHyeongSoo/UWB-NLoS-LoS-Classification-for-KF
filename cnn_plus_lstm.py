@@ -2,24 +2,15 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
-
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
-
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt 
-
+import matplotlib.pyplot as plt
 import time
 import random
 import os
-import uwb_dataset
-
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-random.seed(777)
-torch.manual_seed(777)
-if device == 'cuda':
-    torch.cuda.manual_seed_all(777)
+import data_process as data_process
 
 epochs = 100
 batch_size = 64
@@ -42,34 +33,9 @@ def get_clf_eval(y_true, y_pred, average='weighted'):
         y_true, y_pred, average=average, warn_for=tuple())
     return accuracy, precision, recall, f1
 
-# Data Processing ================================================================
-columns, data = uwb_dataset.import_from_files()
-
-for item in data:
-	item[15:] = item[15:]/float(item[2])
-
-print("\nColumns :", columns.shape, sep=" ")
-print("Data :", data.shape, sep=" ")
-
-cir_n = len(columns[15:])
-
-print("Columns :", columns, sep=" ")
-print("Channel Inpulse Response Count :", cir_n, sep=" ")
-
-df_uwb = pd.DataFrame(data=data, columns=columns)
-print("Channel 2 count :", df_uwb.query("CH == 2")['CH'].count())
-print("Null/NaN Data Count : ", df_uwb.isna().sum().sum())
-df_uwb.head(3)
-
-los_count = df_uwb.query("NLOS == 0")["NLOS"].count()
-nlos_count = df_uwb.query("NLOS == 1")["NLOS"].count()
-
-print("Line of Sight Count :", los_count)
-print("Non Line of Sight Count :", nlos_count)
-
-df_uwb_data = df_uwb[["CIR"+str(i) for i in range(cir_n)]]
-print("UWB DataFrame X for Trainndarray shape : ",df_uwb_data.values.shape)
-df_uwb_data.head(5)
+# Data Load ================================================================
+df_uwb = data_process.df_uwb
+df_uwb_data = data_process.df_uwb_data
 
 x_train, x_test, y_train, y_test = train_test_split(df_uwb_data.values, df_uwb['NLOS'].values, test_size=0.1, random_state=42, stratify=df_uwb['NLOS'].values)
 x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.1, random_state=42, stratify=y_train)
@@ -226,7 +192,7 @@ for epoch in range(epochs):
              val_acc, val_precision, val_recall, val_f1))
 print("Time : ", time.time()-start,'[s]',sep='')
 
-model_save_path = 'UWB-NLoS-LoS-Classification-for-KF/NLoS_Probability_Model.pth'
+model_save_path = 'Models/NLoS_Probability_Model.pth'
 torch.save(model.state_dict(), model_save_path)
 
 
