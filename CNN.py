@@ -30,7 +30,7 @@ in_channels = 1
 out_channels = 2
 batch_size = 64
 num_epochs = 10
-learning_rate = 0.01
+learning_rate = 0.001
 
 def generating_loader(x_data, y_data, batch_size=batch_size, shuffle=True, drop_last=True):
     x_data = np.expand_dims(x_data, axis=1)
@@ -108,7 +108,6 @@ for epoch in range(num_epochs):
 
     train_accuracy = correct_train / total_train
 
-    # Validation
     model.eval()
     val_loss = 0.0
     correct_val = 0
@@ -148,7 +147,34 @@ with torch.no_grad():
         correct += (predicted == labels).sum().item()
 
 test_accuracy = correct / total
-print(f"Test Accuracy: {test_accuracy:.4f}")
-
+print(f"Test Accuracy: {test_accuracy:.4f}") # Test Accuracy: 0.7413(lr=0.01) / Test Accuracy: 0.8559(lr=0.001)
 model_save_path = 'Models/CNN_Classifier.pth'
 torch.save(model.state_dict(), model_save_path)
+
+""" Case of learning rate = 0.01
+Epoch [1/10], Train Loss: 0.5108, Train Accuracy: 0.8015, Val Loss: 0.5006, Val Accuracy: 0.8128
+Epoch [2/10], Train Loss: 0.5061, Train Accuracy: 0.8070, Val Loss: 0.6252, Val Accuracy: 0.6880
+Epoch [3/10], Train Loss: 0.5130, Train Accuracy: 0.8001, Val Loss: 0.5070, Val Accuracy: 0.8061
+Epoch [4/10], Train Loss: 0.5270, Train Accuracy: 0.7862, Val Loss: 0.5219, Val Accuracy: 0.7910
+Epoch [5/10], Train Loss: 0.5240, Train Accuracy: 0.7892, Val Loss: 0.5111, Val Accuracy: 0.8022
+Epoch [6/10], Train Loss: 0.5179, Train Accuracy: 0.7954, Val Loss: 0.5203, Val Accuracy: 0.7929
+Epoch [7/10], Train Loss: 0.5133, Train Accuracy: 0.7999, Val Loss: 0.5251, Val Accuracy: 0.7881
+Epoch [8/10], Train Loss: 0.5184, Train Accuracy: 0.7948, Val Loss: 0.5194, Val Accuracy: 0.7940
+Epoch [9/10], Train Loss: 0.5217, Train Accuracy: 0.7915, Val Loss: 0.4942, Val Accuracy: 0.8191
+Epoch [10/10], Train Loss: 0.5303, Train Accuracy: 0.7830, Val Loss: 0.5716, Val Accuracy: 0.7413
+Test Accuracy: 0.7413
+"""
+
+""" Case of learning rate = 0.001 (Better)
+Epoch [1/10], Train Loss: 0.4781, Train Accuracy: 0.8302, Val Loss: 0.4622, Val Accuracy: 0.8448
+Epoch [2/10], Train Loss: 0.4543, Train Accuracy: 0.8540, Val Loss: 0.4549, Val Accuracy: 0.8522
+Epoch [3/10], Train Loss: 0.4435, Train Accuracy: 0.8660, Val Loss: 0.4501, Val Accuracy: 0.8581
+Epoch [4/10], Train Loss: 0.4374, Train Accuracy: 0.8722, Val Loss: 0.4481, Val Accuracy: 0.8604
+Epoch [5/10], Train Loss: 0.4310, Train Accuracy: 0.8802, Val Loss: 0.4474, Val Accuracy: 0.8588
+Epoch [6/10], Train Loss: 0.4242, Train Accuracy: 0.8870, Val Loss: 0.4480, Val Accuracy: 0.8618
+Epoch [7/10], Train Loss: 0.4185, Train Accuracy: 0.8928, Val Loss: 0.4485, Val Accuracy: 0.8583
+Epoch [8/10], Train Loss: 0.4126, Train Accuracy: 0.9005, Val Loss: 0.4461, Val Accuracy: 0.8633
+Epoch [9/10], Train Loss: 0.4069, Train Accuracy: 0.9063, Val Loss: 0.4469, Val Accuracy: 0.8594
+Epoch [10/10], Train Loss: 0.4019, Train Accuracy: 0.9111, Val Loss: 0.4523, Val Accuracy: 0.8559
+Test Accuracy: 0.8559
+"""

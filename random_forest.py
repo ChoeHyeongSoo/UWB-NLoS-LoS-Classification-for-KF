@@ -2,7 +2,7 @@
 from skorch import NeuralNetClassifier
 from sklearn.model_selection import GridSearchCV
 
-# Hyperparameter Tuning : 랜덤포레스트(분류분석)에 사용 기법 - GridSearchCV 
+# Hyperparameter : 랜덤포레스트(분류분석)에 사용 기법 - GridSearchCV 
 params = {
     'lr': [0.1, 0.01, 0.001],
     'max_epochs': [50, 100],
