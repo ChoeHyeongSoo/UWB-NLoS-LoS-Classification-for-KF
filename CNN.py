@@ -44,6 +44,11 @@ train_loader = generating_loader(x_train, y_train, batch_size=batch_size, shuffl
 val_loader = generating_loader(x_val, y_val, batch_size=batch_size, shuffle=False, drop_last=True)
 test_loader = generating_loader(x_val, y_val, batch_size=batch_size, shuffle=False, drop_last=True)
 
+# data embedding
+# x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1)).transpose(2,0,1)
+# x_val = np.reshape(x_val, (x_val.shape[0], x_val.shape[1], 1)).transpose(2,0,1)
+# x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1)).transpose(2,0,1)
+
 # CNN Model ===============================================================
 class CNN(nn.Module):
     def __init__(self, in_channels=1, out_channels=out_channels):
@@ -56,8 +61,8 @@ class CNN(nn.Module):
             nn.MaxPool1d(kernel_size=2, stride=2)
         )
         
-        self.bn = nn.BatchNorm1d(64)
-        self.fc_layer = nn.Linear(64, 128)
+        self.bn = nn.BatchNorm1d(504)
+        self.fc_layer = nn.Linear(504, 128)
         self.relu = nn.ReLU()
         self.fc_layer_class = nn.Linear(128, out_channels)
         self.softmax = nn.Softmax(dim=1)
@@ -66,7 +71,7 @@ class CNN(nn.Module):
         x = self.conv1d_layer(x)
         x = x[:, -1 :].view(x.size(0), -1)
         x = self.bn(x)
-        x = x.view(x.size(0), -1)
+        # x = x.view(x.size(0), -1)
         x = self.fc_layer(x)
         x = self.relu(x)
         x = self.fc_layer_class(x)
@@ -75,10 +80,9 @@ class CNN(nn.Module):
 
 # 모델 인스턴스 생성
 model = CNN(in_channels=in_channels, out_channels=out_channels)
-loss_function = nn.CrossEntropyLoss()  
+loss_function = nn.CrossEntropyLoss() 
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-# 학습
 for epoch in range(num_epochs):
     model.train()
     train_loss = 0.0
@@ -128,7 +132,6 @@ for epoch in range(num_epochs):
 
     print(f"Epoch [{epoch+1}/{num_epochs}], Train Loss: {train_loss / len(train_loader):.4f}, Train Accuracy: {train_accuracy:.4f}, Val Loss: {val_loss / len(val_loader):.4f}, Val Accuracy: {val_accuracy:.4f}")
 
-# 테스트
 model.eval()
 correct = 0
 total = 0
