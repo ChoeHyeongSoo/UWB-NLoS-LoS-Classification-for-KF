@@ -19,7 +19,6 @@ if device == 'cuda':
     torch.cuda.manual_seed_all(777)
     
 # Data Process : CIR amplitude distribution and distance. (#1 20107)
-
 x = data_process.df_uwb_data.values
 y = data_process.df_uwb['NLOS'].values
 
@@ -27,7 +26,6 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_
 x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.1, random_state=42, stratify=y_train)
 
 # Model&Parameter =======================================================
-
 input_size = x_train.shape[1]
 hidden_size_1 = 512
 hidden_size_2 = 256
@@ -93,6 +91,5 @@ with torch.no_grad():
     print(f'Recall: {recall:.4f}')
     print(f'F1 Score: {f1:.4f}')
 
-# 모델 저장
-torch.save(model.state_dict(), 'Models/dnn_classifier.pth')
-
+model_path = 'Models/dnn_classifier.pth'
+torch.save(model.state_dict(), model_path)

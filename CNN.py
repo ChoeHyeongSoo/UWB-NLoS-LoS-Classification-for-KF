@@ -80,8 +80,11 @@ class CNN(nn.Module):
 
 # 모델 인스턴스 생성
 model = CNN(in_channels=in_channels, out_channels=out_channels)
-loss_function = nn.CrossEntropyLoss() 
+criterion = nn.CrossEntropyLoss() 
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+train_acc = []
+loss_arr = []
 
 for epoch in range(num_epochs):
     model.train()
@@ -96,7 +99,7 @@ for epoch in range(num_epochs):
 
         outputs = model(inputs)
 
-        loss = loss_function(outputs, labels)
+        loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
 
@@ -105,8 +108,10 @@ for epoch in range(num_epochs):
         _, predicted_train = torch.max(outputs, 1)
         total_train += labels.size(0)
         correct_train += (predicted_train == labels).sum().item()
-
-    train_accuracy = correct_train / total_train
+        
+        train_accuracy = correct_train / total_train
+        train_acc.append(train_accuracy)
+        loss_arr.append(loss.item())
 
     model.eval()
     val_loss = 0.0
@@ -119,7 +124,7 @@ for epoch in range(num_epochs):
 
             outputs = model(inputs)
 
-            loss = loss_function(outputs, labels)
+            loss = criterion(outputs, labels)
 
             val_loss += loss.item()
 
@@ -178,3 +183,15 @@ Epoch [9/10], Train Loss: 0.4069, Train Accuracy: 0.9063, Val Loss: 0.4469, Val 
 Epoch [10/10], Train Loss: 0.4019, Train Accuracy: 0.9111, Val Loss: 0.4523, Val Accuracy: 0.8559
 Test Accuracy: 0.8559
 """
+
+f = plt.figure(figsize=[8, 5])
+f.set_facecolor("white")
+
+plt.style.use(['default'])
+plt.plot(loss_arr)
+plt.plot(train_acc)
+
+plt.legend(['Loss', 'Accuracy'])
+plt.ylim((0.0, 1.05))
+plt.grid(True)
+plt.show()

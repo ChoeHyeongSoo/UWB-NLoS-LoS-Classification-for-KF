@@ -171,6 +171,7 @@ for epoch in range(epochs):
             tmp_acc = correct / total  # accuracy
             train_acc.append(tmp_acc.tolist())
             print("[Train] ({}, {}) loss = {:.5f}, Accuracy = {:.4f}, lr={:.6f}".format(epoch, train_iter, loss.item(), tmp_acc, optimizer.param_groups[0]['lr']))
+    
     # validation 
     if epoch % view_val_iter == 0: 
         val_actual_tmp, val_pred_tmp = [], []
@@ -203,8 +204,25 @@ plt.style.use(['default'])
 plt.plot(loss_arr)
 plt.plot(train_acc)
 
-
 plt.legend(['Loss', 'Accuracy'])
 plt.ylim((0.0, 1.05))
 plt.grid(True)
 plt.show()
+
+model.eval()
+correct = 0
+total = 0
+
+with torch.no_grad():
+    for inputs, labels in testloader:
+        inputs, labels = inputs.to(device), labels.to(device)
+
+        outputs = model(inputs)
+
+        _, predicted = torch.max(outputs, 1)
+
+        total += labels.size(0)
+        correct += (predicted == labels).sum().item()
+
+test_accuracy = correct / total
+print(f"Test Accuracy: {test_accuracy:.4f}") # Test Accuracy: 0.9616

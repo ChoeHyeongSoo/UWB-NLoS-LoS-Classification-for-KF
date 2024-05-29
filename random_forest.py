@@ -1,6 +1,10 @@
-
 from skorch import NeuralNetClassifier
 from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import train_test_split
+import numpy as np
+import pandas as pd
+import torch
+import torch.nn as nn
 
 # Hyperparameter : 랜덤포레스트(분류분석)에 사용 기법 - GridSearchCV 
 params = {
